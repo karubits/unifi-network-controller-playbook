@@ -1,4 +1,4 @@
-# Ansible Playbook for the Ubiquiti Unifi Network Controller Installation
+# Ansible Playbook for installing the Ubiquiti Unifi Network Controller
 
 An ansible playbook for installing the Unifi Network Controller.
 
@@ -52,5 +52,5 @@ e.g. https://192.168.4.2:8443
 - A the time of writting, AdoptJDK did not hava a repository releaes for 22.04 (jammy) and focal was used in its place.
 
 
-Interested to know more about the unifi network controller? Want to know how layer 3 adoption works? Check out my postings for Unifi over at https://karubits.com/tags/unfi/ ❤️
+Interested to know more about the unifi network controller? Want to know how layer 3 adoption works? Check out my postings for Unifi over at https://karubits.com/tags/unifi/ ❤️
 
