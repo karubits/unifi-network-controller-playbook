@@ -48,5 +48,5 @@ e.g. https://192.168.4.2:8443
 
 ## Notes
 - MongoDB 3.x is the only release that is currently supported by the Unifi Netowrk Controller. However 3.6 was retired in April 2021 and is now end of life. Unfortunetly until Ubiquiti improves their mongodb support, 3.6 must be installed.
-- If you would like to use a valid TLS certificate I would suggest to look into [acme.sh](https://github.com/acmesh-official/acme.sh/wiki/deployhooks#23-deploy-the-cert-on-a-unifi-controller-or-cloud-key) with LetsEcrypt as it has built in support for Unifi or at least woring with the Java Keystore used by Unifi controllers.
+- If you would like to use a valid TLS certificate I would suggest to look into [acme.sh](https://github.com/acmesh-official/acme.sh/wiki/deployhooks#23-deploy-the-cert-on-a-unifi-controller-or-cloud-key) with LetsEcrypt as it has built in support for deploy hooks with the Unifi Network Controller. There is also an ansible community module for importing certificates into the Java Keystore over [here](https://docs.ansible.com/ansible/latest/collections/community/general/java_cert_module.html).
 - A the time of writting, AdoptJDK did not hava a repository releaes for 22.04 (jammy) and focal was used in its place.
