@@ -1,0 +1,49 @@
+---
+#----------------------------------------------
+# Unifi Network Controller Varibles
+#----------------------------------------------
+unifi_package_dependencies:
+  - gnupg
+  - apt-transport-https
+  - ca-certificates
+unifi_packages:
+  - unifi
+unifi_packages_state: present
+unifi_repo_name: ubiquiti
+unifi_repo_url: deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti
+unifi_repo_state: present
+unifi_repo_key_server: keyserver.ubuntu.com
+unifi_repo_key_id: 06E85760C0A52C50
+unifi_services: unifi
+unifi_services_state: started
+unifi_services_enabled: yes
+unifi_config_file: /etc/default/unifi
+unifi_java_home: /usr/lib/jvm/adoptopenjdk-8-hotspot-jre-amd64
+unifi_dir: "/var/lib/unifi"
+unifi_mongodb_config: /etc/mongod.conf
+unifi_mongodb_services: mongod
+
+#----------------------------------------------
+# MondoDB Varibles
+#----------------------------------------------
+mongodb_version: 3.6
+
+#----------------------------------------------
+# UFW Firewall rules
+#----------------------------------------------
+ufw_logging: low
+ufw_rules:
+  # Ingress Ports Required for L3 Management Over the Internet
+  - { port: 22, proto: tcp,  rule: allow, from_ip: any, comment: 'Port used for ssh access' }
+  - { port: 3478, proto: udp,  rule: allow, from_ip: any, comment: 'Port used for STUN.' }
+  - { port: 8080, proto: tcp,  rule: allow, from_ip: any, comment: 'Port used for device and controller communication' }
+  - { port: 8443, proto: tcp,  rule: allow, from_ip: any, comment: 'Port used for controller GUI/API as seen in a web browser' }
+  - { port: 8880, proto: tcp, rule: allow, from_ip: any, comment: 'Port used for HTTP portal redirection' }
+  - { port: 8843, proto: tcp, rule: allow, from_ip: any, comment: 'Port used for HTTPS portal redirection' }
+  - { port: 6789, proto: tcp, rule: allow, from_ip: any, comment: 'Port used for UniFi mobile speed test.' }
+  # Local Ingress Ports
+  - { port: 5514, proto: udp,  rule: allow, from_ip: any, comment: 'Port used for remote syslog capture' }
+  #- { port: 5656:5699, proto: udp, rule: allow, from_ip: any, comment: 'Ports used by AP-EDU broadcasting.' }
+  - { port: 10001, proto: udp, rule: allow, from_ip: any, comment: 'Port used for device discovery' }
+  - { port: 1900, proto: udp, rule: allow, from_ip: any, comment: 'Port used for "Make controller discoverable on L2 network" in controller settings' }
+#----------------------------------------------
