@@ -21,20 +21,20 @@ An ansible playbook for installing the Unifi Network Controller.
 To run the playbook you will need the IP or hostname of the target server you want to install the Unifi controller on.
 
 1. Open a terminal and run the following. The below command assumes you
-````bash
+````shell
 TARGETPC=  # put your IP address, hostname or fqdn here. Can be comma seperated for multiple servers
 
 ansible-playbook unifi_network_controller_setup.yml -i $TARGETPC,
 ````
 Append the following based on your how you connect to your server
-````bash
+````shell
 --user myusername       # To connect with a specific user account
 --ask-pass              # If an SSH password is required.
 --become                # for sudo escalation
 --ask-become-pass       # If you need to enter a password for sudo escalation.
 ````
 example below:
-````bash
+````shell
 TARGETPC=192.168.2.4
 
 ansible-playbook unifi_network_controller_setup.yml -i $TARGETPC, --ask-pass --become --ask-become-pass --user larry
