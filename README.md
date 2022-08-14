@@ -1,7 +1,8 @@
 # Ansible Playbook for the Ubiquiti Unifi Network Controller Installation
 
-Ansible playbook for installing the Unifi Network Controller.
+An ansible playbook for installing the Unifi Network Controller.
 
+![Unifi Network Controller Dashboard](img/unifi-dashboard.png)
 ## Supported Operating Systems
 
 | OS | Supported | Notes
@@ -38,6 +39,12 @@ TARGETPC=192.168.2.4
 
 ansible-playbook unifi_network_controller_setup.yml -i $TARGETPC, --ask-pass --become --ask-become-pass --user larry
 ````
+3. After installing you should be able to access the controller by using the following url:
+````
+https://{controller IP or fqdn}:8443
+e.g. https://192.168.4.2:8443
+````
+4. Then accept the warning about the invalid certificate to go through the initial setup wizard.
 
 ## Notes
 - MongoDB 3.x is the only release that is currently supported by the Unifi Netowrk Controller. However 3.6 was retired in April 2021 and is now end of life. Unfortunetly until Ubiquiti improves their mongodb support, 3.6 must be installed.
