@@ -3,39 +3,33 @@
   - name: ensure common packages are installed
     apt:
       pkg:
+      - apt-transport-https
+      - ca-certificates
       - gnupg
+      - socat                   # Recommended for acme.sh
       - software-properties-common
       - ufw                     # Uncomplicated Firewall
       - unattended-upgrades     # Automatic security patching
-      - socat                   # Recommended for acme.sh
       state: present
 
-  - name: install dependencies
-    apt:
-      name: "{{ unifi_package_dependencies }}"
-      state: present
-    become: yes
-
-  - name: ensure unifi repo key is installed
-    apt_key:
-      url: "https://dl.ui.com/unifi/unifi-repo.gpg"
-      state: present
+  - name: ensure the unifi gpg key is present (unarmored)
+    get_url:
+      url: https://dl.ui.com/unifi/unifi-repo.gpg
+      dest: "{{ unifi_keypath }}"
+      checksum: sha256:f4625b8f05619d506961d64ca25c262d4a033acf4d1f5303babd7f5b9a971207
 
   - name: install ubnt apt repository
     apt_repository:
-      filename: "{{ unifi_repo_name }}"
-      repo: "{{ unifi_repo_url }}"
-      state: "{{ unifi_repo_state }}"
-    become: yes
+      filename: ubiquiti
+      repo: deb [signed-by={{ unifi_keypath }}] http://www.ubnt.com/downloads/unifi/debian stable ubiquiti
+      state: present
     when: ansible_os_family == "Debian"
 
   - name: install unifi-controller packages
     apt:
-      allow_unauthenticated: yes
-      name: "{{ unifi_packages }}"
-      state: "{{ unifi_packages_state }}"
+      name: unifi
+      state: present
       update_cache: yes
-    become: yes
     notify:
       - restart unifi
 
@@ -44,7 +38,6 @@
       path: '{{ unifi_mongodb_config }}'
       regexp: '^ENABLE_MONGODB='
       line: 'ENABLE_MONGODB=no'
-    become: yes
     notify:
       - restart mongodb
 
@@ -54,17 +47,14 @@
       path: '{{ unifi_config_file }}'
       regexp: '^JAVA_HOME='
       line: 'JAVA_HOME={{ unifi_java_home }}'
-    become: yes
     notify:
       - restart unifi
 
   - name: manage services
     service:
-      name: "{{ item }}"
-      state: "{{ unifi_services_state }}"
-      enabled: "{{ unifi_services_enabled }}"
-    become: yes
-    with_items: "{{ unifi_services }}"
+      name: unifi
+      state: started
+      enabled: yes
 
 # Add a line to a file if the file does not exist, without passing regexp
   - name: ensure modern ciphers are used and hsts is enabled.
@@ -73,9 +63,9 @@
       line: '{{ item.line }}'
       create: yes
     with_items:
-      # - line: "unifi.https.hsts=true"
-      # - line: "unifi.https.hsts.max_age=31536000"
-      # - line: "unifi.https.hsts.preload=true"
+      - line: "unifi.https.hsts=true"
+      - line: "unifi.https.hsts.max_age=31536000"
+      - line: "unifi.https.hsts.preload=true"
       - line: "unifi.https.ciphers=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
       - line: "unifi.https.sslEnabledProtocols=TLSv1.2"
     notify:

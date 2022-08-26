@@ -1,14 +1,12 @@
 ---
 - name: restart unifi
   service:
-    name: "{{ item }}"
+    name: unifi
     state: restarted
-  become: yes
-  with_items: "{{ unifi_services }}"
 
 - name: restart mongodb
   service:
-    name: "{{ item }}"
+    name: mongod
     state: restarted
-  become: yes
-  with_items: "{{ unifi_mongodb_services }}"
+
+

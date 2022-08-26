@@ -5,22 +5,29 @@
       pkg:
         - gnupg
         - software-properties-common
+        - wget 
 
-  - name: ensure adopt open jdk apt key is present
-    apt_key:
+  - name: ensure the armored key is present
+    get_url:
       url: https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public
-      state: present
+      dest: "{{ adoptopenjdk_keypath }}_armored"
+      checksum: sha256:428ce45ffbc74e350d707d95c661de959a2e43129a869bd82d78d1556a936440
+
+  - name: dearmor the adoptjdk gpg key
+    shell: "gpg --dearmor < {{ adoptopenjdk_keypath }}_armored > {{ adoptopenjdk_keypath }}"
+    args:
+      creates: "{{ adoptopenjdk_keypath }}"
 
   - name: ensure the adoptjdk repoistory is present
-    ansible.builtin.apt_repository:
-      repo: deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ {{ ansible_distribution_release }} main
+    apt_repository:
+      repo: deb [signed-by={{ adoptopenjdk_keypath }}] https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ {{ ansible_distribution_release }} main
       state: present
       filename: adoptopenjdk
     when: ansible_distribution_release != "jammy" # Jammy Jellyfish currently does not have a release
 
   - name: "[Ubuntu 22.04] ensure the adoptjdk repoistory is present"
-    ansible.builtin.apt_repository:
-      repo: deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ focal main
+    apt_repository:
+      repo: deb [signed-by={{ adoptopenjdk_keypath }}] https://adoptopenjdk.jfrog.io/adoptopenjdk/deb/ focal main
       state: present
       filename: adoptopenjdk
     when: ansible_distribution_release == "jammy"
