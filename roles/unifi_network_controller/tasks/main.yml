@@ -2,6 +2,7 @@
 
 - name: Step 1 - Setup Java enviroment for the Unifi Network Conctroller
   include_tasks: adoptopenjdk.yml
+  tags: gpg
 
 - name: Step 2 - Setup Mongo DB
   include_tasks: mongodb.yml
