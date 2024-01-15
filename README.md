@@ -47,10 +47,15 @@ e.g. https://192.168.4.2:8443
 4. Then accept the warning about the invalid certificate to go through the initial setup wizard.
 
 ## Notes
-- MongoDB 3.x is the only release that is currently supported by the Unifi Network Controller. However 3.6 was retired in April 2021 and is now end of life. Unfortunately until Ubiquiti improves their mongodb support, 3.6 must be installed.
 - If you would like to use a valid TLS certificate I would suggest to look into [acme.sh](https://github.com/acmesh-official/acme.sh/wiki/deployhooks#23-deploy-the-cert-on-a-unifi-controller-or-cloud-key) with LetsEncrypt as it has built in support for deploy hooks with the Unifi Network Controller. There is also an ansible community module for importing certificates into the Java Keystore over [here](https://docs.ansible.com/ansible/latest/collections/community/general/java_cert_module.html).
-- A the time of writing, AdoptJDK did not have a repository release for 22.04 (jammy) and focal was used in its place.
-- AdoptJDK is no longer supported and has moved over to [Eclipse Temurin](https://adoptium.net/en-GB/temurin/releases?version=8). I haven't tested moving to this variant yet and I was personally hoping for a repository to help keep it up to date. I will also consider [AWS Correto 8](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html) as well, they also have their own debian packages. 
+<br>
+
+## Docker
+
+If you want to use Docker instead of Ansible I have a compose example over [here](https://github.com/karubits/composeyourself/tree/main/unifi-network-controller).
+
+<br>
+<br>
 
 Are you interested to know more about the Unifi network controller? Want to know how layer 3 adoption works? Check out my postings for Unifi over at https://karubits.com/tags/unifi/ ❤️
 

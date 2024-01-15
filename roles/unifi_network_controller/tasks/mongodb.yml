@@ -6,33 +6,21 @@
 
   - name: ensure the armored key is present
     get_url:
-      url: https://www.mongodb.org/static/pgp/server-3.6.asc
+      url: https://www.mongodb.org/static/pgp/server-4.4.asc
       dest: "{{ mongodb_keypath }}_armored"
-      checksum: sha256:34b7dbba20ae04a2a968cff4c3e2b239e6c265e3be00aa35b55c2e45d6111307
+      checksum: sha256:b5b674e0fee2ff6e5f007a59bf3be522f3382f90f2c2c796e4a9b7095eb58e94
 
   - name: dearmor the mongodb gpg key
     shell: "gpg --dearmor < {{ mongodb_keypath }}_armored > {{ mongodb_keypath }}"
     args:
       creates: "{{ mongodb_keypath }}"
 
-  - name: "[Debian] ensure the mongodb is present (have to use stretch repo for MondoDB 3.x due to ubiquiti not updating their support for MongoDB)"
+  - name: "Ensure MongoDB is present"
     apt_repository:
-      repo: "deb [signed-by={{ mongodb_keypath }}] http://repo.mongodb.org/apt/{{ ansible_distribution | lower }} stretch/mongodb-org/{{ mongodb_version }} main"
+      repo: "deb [signed-by={{ mongodb_keypath }}] {{ mongodb_repo_url }}"
       state: present
       filename: "mongodb-{{ mongodb_version }}"
-    when: ansible_distribution == "Debian"
-
-  - name: "[Ubuntu] ensure the mongodb is present (have to use xenial repo for MondoDB 3.x due to ubiquiti not updating their support for MongoDB)"
-    apt_repository:
-      repo: "deb [signed-by={{ mongodb_keypath }}] http://repo.mongodb.org/apt/{{ ansible_distribution | lower }} xenial/mongodb-org/{{ mongodb_version }} multiverse"
-      state: present
-      filename: "mongodb-{{ mongodb_version }}"
-    when: ansible_distribution == "Ubuntu"
-
-  - name: "[Ubuntu] ensure libssl 1.0.0 is present (dep for MongoDB)"
-    apt:
-      deb: http://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5_amd64.deb
-    when: ansible_distribution == "Ubuntu"
+    when: ansible_distribution in ['Debian', 'Ubuntu']
 
   - name: "ensure mondo db {{ mongodb_version }} is present"
     apt:

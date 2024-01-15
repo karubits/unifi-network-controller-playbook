@@ -8,14 +8,18 @@ unifi_dir: "/var/lib/unifi"
 unifi_mongodb_config: /etc/mongod.conf
 
 # gpg key paths:
-adoptopenjdk_keypath: /etc/apt/trusted.gpg.d/adoptopenjdk.gpg
-mongodb_keypath: /etc/apt/trusted.gpg.d/mongo_server_3.6.gpg
-unifi_keypath: /etc/apt/trusted.gpg.d/unifi.gpg
+apt_key_path: /usr/share/keyrings
+adoptopenjdk_keypath: "{{ apt_key_path }}/adoptopenjdk.gpg"
+mongodb_keypath: "{{ apt_key_path }}/mongo_server_4.4.gpg"
+unifi_keypath: "{{ apt_key_path }}/unifi.gpg"
 #----------------------------------------------
 # MondoDB Varibles
 #----------------------------------------------
-mongodb_version: 3.6
+mongodb_version: 4.4
 
+mongodb_repo_url: "http://repo.mongodb.org/apt/{{ ansible_distribution | lower }}/{{ mongodb_codename }}/mongodb-org/{{ mongodb_version }}{{ mongodb_multiverse }}"
+mongodb_multiverse: "{{ ' multiverse' if ansible_distribution == 'Ubuntu' else '' }}"
+mongodb_codename: "{{ 'buster' if ansible_distribution == 'Debian' else 'xenial' }}"
 #----------------------------------------------
 # UFW Firewall rules
 #----------------------------------------------
