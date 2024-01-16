@@ -6,9 +6,9 @@
 
   - name: ensure the armored key is present
     get_url:
-      url: https://www.mongodb.org/static/pgp/server-4.4.asc
+      url: "{{ mongodb_key_url }}"
       dest: "{{ mongodb_keypath }}_armored"
-      checksum: sha256:b5b674e0fee2ff6e5f007a59bf3be522f3382f90f2c2c796e4a9b7095eb58e94
+      checksum: "sha256:{{ mongodb_key_sha256 }}"
 
   - name: dearmor the mongodb gpg key
     shell: "gpg --dearmor < {{ mongodb_keypath }}_armored > {{ mongodb_keypath }}"

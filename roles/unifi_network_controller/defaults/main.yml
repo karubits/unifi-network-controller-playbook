@@ -1,25 +1,29 @@
 ---
 #----------------------------------------------
-# Unifi Network Controller Varibles
+# Unifi Network Controller Variables
 #----------------------------------------------
 unifi_config_file: /etc/default/unifi
-unifi_java_home: /usr/lib/jvm/adoptopenjdk-8-hotspot-jre-amd64
-unifi_dir: "/var/lib/unifi"
+unifi_dir: /var/lib/unifi
+unifi_java_home: usr/lib/jvm/java-17-openjdk-amd64
 unifi_mongodb_config: /etc/mongod.conf
 
 # gpg key paths:
 apt_key_path: /usr/share/keyrings
-adoptopenjdk_keypath: "{{ apt_key_path }}/adoptopenjdk.gpg"
-mongodb_keypath: "{{ apt_key_path }}/mongo_server_4.4.gpg"
-unifi_keypath: "{{ apt_key_path }}/unifi.gpg"
+mongodb_key_path: "{{ apt_key_path }}/mongo_server_4.4.gpg"
+mongodb_key_url: https://www.mongodb.org/static/pgp/server-4.4.asc
+mongodb_key_sha256: b5b674e0fee2ff6e5f007a59bf3be522f3382f90f2c2c796e4a9b7095eb58e94
+unifi_key_path: "{{ apt_key_path }}/unifi.gpg"
+unifi_key_url: https://dl.ui.com/unifi/unifi-repo.gpg
+unifi_key_sha256: f4625b8f05619d506961d64ca25c262d4a033acf4d1f5303babd7f5b9a971207
+
 #----------------------------------------------
-# MondoDB Varibles
+# MondoDB Variables
 #----------------------------------------------
+mongodb_codename: "{{ 'buster' if ansible_distribution == 'Debian' else 'xenial' }}"
+mongodb_multiverse: "{{ ' multiverse' if ansible_distribution == 'Ubuntu' else '' }}"
+mongodb_repo_url: "http://repo.mongodb.org/apt/{{ ansible_distribution | lower }}/{{ mongodb_codename }}/mongodb-org/{{ mongodb_version }}{{ mongodb_multiverse }}"
 mongodb_version: 4.4
 
-mongodb_repo_url: "http://repo.mongodb.org/apt/{{ ansible_distribution | lower }}/{{ mongodb_codename }}/mongodb-org/{{ mongodb_version }}{{ mongodb_multiverse }}"
-mongodb_multiverse: "{{ ' multiverse' if ansible_distribution == 'Ubuntu' else '' }}"
-mongodb_codename: "{{ 'buster' if ansible_distribution == 'Debian' else 'xenial' }}"
 #----------------------------------------------
 # UFW Firewall rules
 #----------------------------------------------

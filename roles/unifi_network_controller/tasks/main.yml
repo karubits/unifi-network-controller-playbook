@@ -1,11 +1,7 @@
 ---
 
-- name: Step 1 - Setup Java enviroment for the Unifi Network Conctroller
-  include_tasks: adoptopenjdk.yml
-  tags: gpg
-
-- name: Step 2 - Setup Mongo DB
+- name: Step 1 - Setup Mongo DB
   include_tasks: mongodb.yml
 
-- name: Step 3 - Install the Unifi Network Controller
+- name: Step 2 - Install the Unifi Network Controller
   include_tasks: unifi_network_controller.yml

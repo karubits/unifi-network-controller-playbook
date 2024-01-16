@@ -1,11 +1,12 @@
 ---
-  # unifi_network_controller playbook (execuation happens after mongodb and jave)
+  # unifi_network_controller playbook (execution happens after mongodb and jave)
   - name: ensure common packages are installed
     apt:
       pkg:
       - apt-transport-https
       - ca-certificates
       - gnupg
+      - openjdk-17-jre-headless
       - socat                   # Recommended for acme.sh
       - software-properties-common
       - ufw                     # Uncomplicated Firewall
@@ -14,9 +15,9 @@
 
   - name: ensure the unifi gpg key is present (unarmored)
     get_url:
-      url: https://dl.ui.com/unifi/unifi-repo.gpg
+      url: "{{ unifi_key_url }}"
       dest: "{{ unifi_keypath }}"
-      checksum: sha256:f4625b8f05619d506961d64ca25c262d4a033acf4d1f5303babd7f5b9a971207
+      checksum: "sha256:{{ unifi_key_sha256 }}"
 
   - name: install ubnt apt repository
     apt_repository:
