@@ -1,12 +1,10 @@
 ---
-- name: restart unifi
-  service:
+- name: Restart unifi
+  ansible.builtin.service:
     name: unifi
     state: restarted
 
-- name: restart mongodb
-  service:
+- name: Restart mongodb
+  ansible.builtin.service:
     name: mongod
     state: restarted
-
-

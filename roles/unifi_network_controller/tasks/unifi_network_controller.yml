@@ -1,102 +1,107 @@
 ---
-  # unifi_network_controller playbook (execution happens after mongodb and jave)
-  - name: ensure common packages are installed
-    apt:
-      pkg:
+# unifi_network_controller playbook (execution happens after mongodb and jave)
+- name: Ensure common packages are installed
+  ansible.builtin.apt:
+    pkg:
       - apt-transport-https
       - ca-certificates
       - gnupg
       - openjdk-17-jre-headless
-      - socat                   # Recommended for acme.sh
+      - socat # Recommended for acme.sh
       - software-properties-common
-      - ufw                     # Uncomplicated Firewall
-      - unattended-upgrades     # Automatic security patching
-      state: present
+      - ufw # Uncomplicated Firewall
+      - unattended-upgrades # Automatic security patching
+    state: present
 
-  - name: ensure the unifi gpg key is present (unarmored)
-    get_url:
-      url: "{{ unifi_key_url }}"
-      dest: "{{ unifi_keypath }}"
-      checksum: "sha256:{{ unifi_key_sha256 }}"
+- name: Ensure the unifi gpg key is present (unarmored)
+  ansible.builtin.get_url:
+    url: "{{ unifi_key_url }}"
+    dest: "{{ unifi_keypath }}"
+    checksum: "sha256:{{ unifi_key_sha256 }}"
+    mode: u=rw,g=r,o=r
 
-  - name: install ubnt apt repository
-    apt_repository:
-      filename: ubiquiti
-      repo: deb [signed-by={{ unifi_keypath }}] http://www.ubnt.com/downloads/unifi/debian stable ubiquiti
-      state: present
-    when: ansible_os_family == "Debian"
+- name: Install ubnt apt repository
+  ansible.builtin.apt_repository:
+    filename: ubiquiti
+    repo: deb [signed-by={{ unifi_keypath }}] http://www.ubnt.com/downloads/unifi/debian stable ubiquiti
+    state: present
+  when: ansible_os_family == "Debian"
 
-  - name: install unifi-controller packages
-    apt:
-      name: unifi
-      state: present
-      update_cache: yes
-    notify:
-      - restart unifi
+- name: Install unifi-controller packages
+  ansible.builtin.apt:
+    name: unifi
+    state: present
+    update_cache: true
+  notify:
+    - restart unifi
 
-  - name: disable mongodb default instance
-    lineinfile:
-      path: '{{ unifi_mongodb_config }}'
-      regexp: '^ENABLE_MONGODB='
-      line: 'ENABLE_MONGODB=no'
-    notify:
-      - restart mongodb
+- name: Disable mongodb default instance
+  ansible.builtin.lineinfile:
+    path: "{{ unifi_mongodb_config }}"
+    regexp: ^ENABLE_MONGODB=
+    line: ENABLE_MONGODB=no
+  notify:
+    - restart mongodb
 
-  - name: configure java for unifi
-    lineinfile:
-      create: yes
-      path: '{{ unifi_config_file }}'
-      regexp: '^JAVA_HOME='
-      line: 'JAVA_HOME={{ unifi_java_home }}'
-    notify:
-      - restart unifi
+- name: Configure java for unifi
+  ansible.builtin.lineinfile:
+    create: true
+    path: "{{ unifi_config_file }}"
+    regexp: ^JAVA_HOME=
+    line: JAVA_HOME={{ unifi_java_home }}
+    mode: u=rw,g=r,o=r
+  notify:
+    - restart unifi
 
-  - name: manage services
-    service:
-      name: unifi
-      state: started
-      enabled: yes
+- name: Manage services
+  ansible.builtin.service:
+    name: unifi
+    state: started
+    enabled: true
 
 # Add a line to a file if the file does not exist, without passing regexp
-  - name: ensure modern ciphers are used and hsts is enabled.
-    ansible.builtin.lineinfile:
-      path:  "{{ unifi_dir }}/system.properties"
-      line: '{{ item.line }}'
-      create: yes
-    with_items:
-      - line: "unifi.https.hsts=true"
-      - line: "unifi.https.hsts.max_age=31536000"
-      - line: "unifi.https.hsts.preload=true"
-      - line: "unifi.https.ciphers=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
-      - line: "unifi.https.sslEnabledProtocols=TLSv1.2"
-    notify:
-      - restart unifi
+- name: Ensure modern ciphers are used and hsts is enabled.
+  ansible.builtin.lineinfile:
+    path: "{{ unifi_dir }}/system.properties"
+    line: "{{ item.line }}"
+    create: true
+    mode: u=rw,g=r,o=r
+    owner: unifi
+    group: unifi
+  with_items:
+    - line: unifi.https.hsts=true
+    - line: unifi.https.hsts.max_age=31536000
+    - line: unifi.https.hsts.preload=true
+    - line: unifi.https.ciphers=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+    - line: unifi.https.sslEnabledProtocols=TLSv1.2
+  notify:
+    - restart unifi
 
-  - name: Setting ufw logging to
-    ufw:
-      logging: "{{ ufw_logging }}"
-      state: enabled
+- name: Setting ufw logging to
+  community.general.ufw:
+    logging: "{{ ufw_logging }}"
+    state: enabled
 
-  - name: ensure rules are applied
-    ufw:
-      comment: "{{ item.comment | default(omit) }}"
-      delete: "{{ item.delete | default(omit) }}"
-      direction: "{{ item.direction | default(omit) }}"
-      from_ip: "{{ item.from_ip | default(omit) }}"
-      from_port: "{{ item.from_port | default(omit) }}"
-      insert: "{{ item.insert | default(omit) }}"
-      interface: "{{ item.interface | default(omit) }}"
-      log: "{{ item.log | default(omit) }}"
-      logging: "{{ item.logging | default(omit) }}"
-      name: "{{ item.name | default(omit) }}"
-      policy: "{{ item.policy | default(omit) }}"
-      port: "{{ item.port | default(omit) }}"
-      proto: "{{ item.proto | default(omit) }}"
-      rule: "{{ item.rule | default('allow') }}"
-      state: "{{ item.state | default(omit) }}"
-      to_ip: "{{ item.to_ip | default(omit) }}"
-      to_port: "{{ item.to_port | default(omit) }}"
-      route: "{{ item.route | default(omit) }}"
-    with_items: "{{ ufw_rules }}"
-    tags:
-      - ufw
+- name: Ensure rules are applied
+  community.general.ufw:
+    comment: "{{ item.comment | default(omit) }}"
+    delete: "{{ item.delete | default(omit) }}"
+    direction: "{{ item.direction | default(omit) }}"
+    from_ip: "{{ item.from_ip | default(omit) }}"
+    from_port: "{{ item.from_port | default(omit) }}"
+    insert: "{{ item.insert | default(omit) }}"
+    interface: "{{ item.interface | default(omit) }}"
+    log: "{{ item.log | default(omit) }}"
+    logging: "{{ item.logging | default(omit) }}"
+    name: "{{ item.name | default(omit) }}"
+    policy: "{{ item.policy | default(omit) }}"
+    port: "{{ item.port | default(omit) }}"
+    proto: "{{ item.proto | default(omit) }}"
+    rule: "{{ item.rule | default('allow') }}"
+    state: "{{ item.state | default(omit) }}"
+    to_ip: "{{ item.to_ip | default(omit) }}"
+    to_port: "{{ item.to_port | default(omit) }}"
+    route: "{{ item.route | default(omit) }}"
+  with_items: "{{ ufw_rules }}"
+  tags:
+    - ufw

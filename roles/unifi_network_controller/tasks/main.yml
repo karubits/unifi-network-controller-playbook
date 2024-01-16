@@ -1,7 +1,5 @@
 ---
-
 - name: Step 1 - Setup Mongo DB
-  include_tasks: mongodb.yml
-
+  ansible.builtin.include_tasks: mongodb.yml
 - name: Step 2 - Install the Unifi Network Controller
-  include_tasks: unifi_network_controller.yml
+  ansible.builtin.include_tasks: unifi_network_controller.yml

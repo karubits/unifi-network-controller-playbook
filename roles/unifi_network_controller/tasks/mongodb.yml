@@ -1,40 +1,41 @@
 ---
-  - name: check mongodb if gpg key exists
-    stat:
-      path: "{{ mongodb_keypath }}"
-    register: mongodb_check
+- name: Check mongodb if gpg key exists
+  ansible.builtin.stat:
+    path: "{{ mongodb_keypath }}"
+  register: mongodb_check
 
-  - name: ensure the armored key is present
-    get_url:
-      url: "{{ mongodb_key_url }}"
-      dest: "{{ mongodb_keypath }}_armored"
-      checksum: "sha256:{{ mongodb_key_sha256 }}"
+- name: Ensure the armored key is present
+  ansible.builtin.get_url:
+    url: "{{ mongodb_key_url }}"
+    dest: "{{ mongodb_keypath }}_armored"
+    checksum: sha256:{{ mongodb_key_sha256 }}
+    mode: u=rw,g=r,o=r
 
-  - name: dearmor the mongodb gpg key
-    shell: "gpg --dearmor < {{ mongodb_keypath }}_armored > {{ mongodb_keypath }}"
-    args:
-      creates: "{{ mongodb_keypath }}"
+- name: Dearmor the mongodb gpg key
+  ansible.builtin.shell: gpg --dearmor < {{ mongodb_keypath }}_armored > {{ mongodb_keypath }}
+  args:
+    creates: "{{ mongodb_keypath }}"
 
-  - name: "Ensure MongoDB is present"
-    apt_repository:
-      repo: "deb [signed-by={{ mongodb_keypath }}] {{ mongodb_repo_url }}"
-      state: present
-      filename: "mongodb-{{ mongodb_version }}"
-    when: ansible_distribution in ['Debian', 'Ubuntu']
+- name: Ensure MongoDB is present
+  ansible.builtin.apt_repository:
+    repo: deb [signed-by={{ mongodb_keypath }}] {{ mongodb_repo_url }}
+    state: present
+    filename: mongodb-{{ mongodb_version }}
+  when: ansible_distribution in ['Debian', 'Ubuntu']
 
-  - name: "ensure mondo db {{ mongodb_version }} is present"
-    apt:
-      name: mongodb-org
-      state: present
-      update_cache: yes
+- name: Ensure mondo db is present
+  ansible.builtin.apt:
+    name: mongodb-org
+    state: present
+    update_cache: true
 
-  - name: ensure the systemd service is reload and the mongod service has started
-    ansible.builtin.systemd:
-      state: started
-      daemon_reload: yes
-      name: mongod
+- name: Ensure the systemd service is reload and the mongod service has started
+  ansible.builtin.systemd:
+    state: started
+    daemon_reload: true
+    name: mongod
 
-  - name: ensure the mongod service is enabled
-    ansible.builtin.systemd:
-      enabled: yes
-      name: mongod
+- name: Ensure the mongod service is enabled
+  ansible.builtin.systemd:
+    enabled: true
+    name: mongod

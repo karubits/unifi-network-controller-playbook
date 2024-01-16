@@ -1,7 +1,7 @@
 ---
-#----------------------------------------------
+# ----------------------------------------------
 # Unifi Network Controller Variables
-#----------------------------------------------
+# ----------------------------------------------
 unifi_config_file: /etc/default/unifi
 unifi_dir: /var/lib/unifi
 unifi_java_home: usr/lib/jvm/java-17-openjdk-amd64
@@ -16,30 +16,34 @@ unifi_key_path: "{{ apt_key_path }}/unifi.gpg"
 unifi_key_url: https://dl.ui.com/unifi/unifi-repo.gpg
 unifi_key_sha256: f4625b8f05619d506961d64ca25c262d4a033acf4d1f5303babd7f5b9a971207
 
-#----------------------------------------------
+# ----------------------------------------------
 # MondoDB Variables
-#----------------------------------------------
+# ----------------------------------------------
 mongodb_codename: "{{ 'buster' if ansible_distribution == 'Debian' else 'xenial' }}"
 mongodb_multiverse: "{{ ' multiverse' if ansible_distribution == 'Ubuntu' else '' }}"
-mongodb_repo_url: "http://repo.mongodb.org/apt/{{ ansible_distribution | lower }}/{{ mongodb_codename }}/mongodb-org/{{ mongodb_version }}{{ mongodb_multiverse }}"
+mongodb_repo_url: http://repo.mongodb.org/apt/{{ ansible_distribution | lower }}/{{ mongodb_codename }}/mongodb-org/{{ mongodb_version }}{{ mongodb_multiverse }}
 mongodb_version: 4.4
 
-#----------------------------------------------
+# ----------------------------------------------
 # UFW Firewall rules
-#----------------------------------------------
+# ----------------------------------------------
 ufw_logging: low
 ufw_rules:
   # Ingress Ports Required for L3 Management Over the Internet
-  - { port: 22, proto: tcp,  rule: allow, from_ip: any, comment: 'Port used for ssh access' }
-  - { port: 3478, proto: udp,  rule: allow, from_ip: any, comment: 'Port used for STUN.' }
-  - { port: 8080, proto: tcp,  rule: allow, from_ip: any, comment: 'Port used for device and controller communication' }
-  - { port: 8443, proto: tcp,  rule: allow, from_ip: any, comment: 'Port used for controller GUI/API as seen in a web browser' }
-  - { port: 8880, proto: tcp, rule: allow, from_ip: any, comment: 'Port used for HTTP portal redirection' }
-  - { port: 8843, proto: tcp, rule: allow, from_ip: any, comment: 'Port used for HTTPS portal redirection' }
-  - { port: 6789, proto: tcp, rule: allow, from_ip: any, comment: 'Port used for UniFi mobile speed test.' }
+  - { port: 22, proto: tcp, rule: allow, from_ip: any, comment: Port used for ssh access }
+  - { port: 3478, proto: udp, rule: allow, from_ip: any, comment: Port used for STUN. }
+  - { port: 8080, proto: tcp, rule: allow, from_ip: any, comment: Port used for device and controller communication }
+  - { port: 8443, proto: tcp, rule: allow, from_ip: any, comment: Port used for controller GUI/API as seen in a web browser }
+  - { port: 8880, proto: tcp, rule: allow, from_ip: any, comment: Port used for HTTP portal redirection }
+  - { port: 8843, proto: tcp, rule: allow, from_ip: any, comment: Port used for HTTPS portal redirection }
+  - { port: 6789, proto: tcp, rule: allow, from_ip: any, comment: Port used for UniFi mobile speed test. }
   # Local Ingress Ports
-  - { port: 5514, proto: udp,  rule: allow, from_ip: any, comment: 'Port used for remote syslog capture' }
-  #- { port: 5656:5699, proto: udp, rule: allow, from_ip: any, comment: 'Ports used by AP-EDU broadcasting.' }
-  - { port: 10001, proto: udp, rule: allow, from_ip: any, comment: 'Port used for device discovery' }
-  - { port: 1900, proto: udp, rule: allow, from_ip: any, comment: 'Port used for "Make controller discoverable on L2 network" in controller settings' }
-#----------------------------------------------
+  - { port: 5514, proto: udp, rule: allow, from_ip: any, comment: Port used for remote syslog capture }
+  #   - { port: 5656:5699, proto: udp, rule: allow, from_ip: any, comment: 'Ports used by AP-EDU broadcasting.' }
+  - { port: 10001, proto: udp, rule: allow, from_ip: any, comment: Port used for device discovery }
+  - port: 1900
+    proto: udp
+    rule: allow
+    from_ip: any
+    comment: Port used for "Make controller discoverable on L2 network" in controller settings
+# ----------------------------------------------
